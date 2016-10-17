@@ -1,5 +1,35 @@
 
 require 'graphql'
+require_relative './schema/list_type'
+
+EmployeeCursorType = CursorType.define do
+  item_type EmployeeType
+
+  input_resolver -> (string, args, context) do
+    string.split(':')
+  end
+
+  output_resolver -> (items, args, context) do
+  end
+end
+
+'''
+aoeu
+aoeu
+aoeu
+'''
+
+EmployeeCursorType::InputType
+EmployeeCursorType::OutputType
+
+EmployeeListType = GraphQL::ObjectType.define do
+  name 'EmployeeList'
+
+  argument
+
+  field :cursor, EmployeeCursorType::OutputType
+  field
+end
 
 QueryType = GraphQL::ObjectType.define do
   name 'Query'
@@ -15,9 +45,10 @@ QueryType = GraphQL::ObjectType.define do
   end
 
   field :employees do
-    type types[EmployeeType]
+    type EmployeeListType
     argument :first, types.Int
     argument :id, types.Int
+    argument :after, types.
 
     resolve -> (query, args, context) do
       employees = Employee.where(merchant_token: context[:current_merchant].token)
@@ -39,19 +70,6 @@ QueryType = GraphQL::ObjectType.define do
       units = units.first(args[:first]) if args[:first].present?
 
       units
-    end
-  end
-end
-
-EmployeeType = GraphQL::ObjectType.define do
-  name 'Employee'
-  field :first_name, types.String
-  field :last_name, types.String
-  field :authorized_units do
-    type types[types.String]
-    resolve -> (employee, args, ctx) do
-      puts ctx
-      employee.authorized_subunits.map(&:token)
     end
   end
 end
